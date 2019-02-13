@@ -1,0 +1,38 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+view "external" {
+	match-clients { any; };
+	allow-recursion { any; };
+	recursion no;
+	zone "test" {
+		type master;
+		notify-source 5.135.3.76;	#DNS-SLAVE
+		allow-transfer { 5.135.3.76; }; #DNS-SLAVE
+		file "/etc/bind/views/db.external.conf";
+	};
+	include "/etc/bind/named.conf.default-zones";
+};
+
+acl interna {
+        192.168.1.0/24 ;
+        localhost;
+};
+
+view "internal" {
+        match-clients { interna; };
+        allow-recursion { any; };
+        zone "test" {
+                type master;
+                file "/etc/bind/views/db.internal.conf";
+        };
+
+        include "/etc/bind/named.conf.default-zones";
+};
+
+
